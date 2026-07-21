@@ -1,0 +1,105 @@
+# Inventory Reservation and Order Fulfilment API
+
+## Project Purpose
+A backend system that allows customers to place orders on products while
+guaranteeing stock accuracy — using row-level database locks to reserve
+stock atomically, prevent overselling, and safely expire abandoned
+reservations.
+
+## Technology Stack
+- Node.js + Express
+- PostgreSQL (via Supabase)
+- JWT authentication
+- node-cron for background jobs
+- Nodemailer for notifications
+- Swagger/OpenAPI for documentation
+- Winston for structured logging
+
+## Architecture
+Each module follows: **Route → Controller → Service → Database**.
+Business logic and transactions live entirely in the service layer.
+
+## Setup Instructions
+
+1. Clone the repo and install dependencies:
+```bash
+   npm install
+```
+
+2. Copy `.env.example` to `.env` and fill in your own values:
+```bash
+   cp .env.example .env
+```
+
+3. Run the SQL schema (see below) in your Supabase SQL editor.
+
+4. Seed the database:
+```bash
+   npm run seed
+```
+
+5. Start the API:
+```bash
+   npm run dev
+```
+
+6. Open API docs at `http://localhost:3500/api-docs`
+
+## Environment Variables
+See `.env.example` for the full list — includes `DATABASE_URL`,
+`JWT_SECRET`, email credentials, and `RESERVATION_EXPIRY_MINUTES`.
+
+## Supabase Configuration
+Uses Supabase only as a managed PostgreSQL instance (via `pg` and a
+connection pool) — not the Supabase client SDK. SSL is required
+(`ssl: { rejectUnauthorized: false }` in `common/db.js`).
+
+## How to Start Background Workers / Scheduled Jobs
+Background jobs start automatically with the server (`server.js` calls
+`startScheduler()`), no separate process needed:
+- **Reservation expiry** — runs every minute
+- **Notification retry worker** — runs every 30 seconds
+
+## Default Seeded Users
+| Role | Email | Password |
+|---|---|---|
+| Admin | admin@test.com | Passw0rd@123 |
+| Staff | staff1@test.com | Passw0rd@123 |
+| Staff | staff2@test.com | Passw0rd@123 |
+| Customer | customer1@test.com | Passw0rd@123 |
+| Customer | customer2@test.com | Passw0rd@123 |
+| Customer | customer3@test.com | Passw0rd@123 |
+
+## How Idempotency Works
+Order creation accepts an `Idempotency-Key` header. Before creating an
+order, the service checks `idempotency_keys` for that customer + key
+combination. If found, the original order response is returned instead
+of creating a duplicate. The key is stored only after a successful
+commit, scoped uniquely per customer (`UNIQUE(customerid, idempotencykey)`).
+
+## How Stock Reservation Works
+Order creation runs inside a single database transaction:
+1. Every product row is locked with `SELECT ... FOR UPDATE`.
+2. Status and available stock are validated per item.
+3. If everything is valid, `availableqty` decreases and `reservedqty`
+   increases for each product, the order + order_items are inserted,
+   and an inventory-history row is recorded — all in the same transaction.
+4. If any item fails validation, the whole transaction rolls back — no
+   partial orders, no partial stock changes.
+
+## How Concurrency Is Handled
+`SELECT ... FOR UPDATE` places a row-level lock on each product being
+reserved. If two requests try to reserve the same product at the same
+time, the second request's transaction waits until the first commits or
+rolls back — so two customers can never reserve the same final unit.
+
+## How Notification Retries Work
+Notifications are queued (status `PENDING`) instantly when an order
+event happens — the API does not wait for email delivery. A background
+worker (every 30 seconds) picks up `PENDING`/`FAILED` notifications with
+`retrycount < 3`, attempts delivery, and marks them `SENT` or increments
+`retrycount` on failure. After 3 failed attempts, a notification stops
+being retried.
+
+## Running Tests
+_(Not included in this build — can be added with Jest + Supertest.)_
