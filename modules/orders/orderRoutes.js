@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("./orderController");
-const auth = require("../../common/middleWares/auth");
-const role = require("../../common/middleWares/role");
+const auth = require("../../common/middlewares/auth");
+const role = require("../../common/middlewares/role");
 const ROLES = require("../../common/constants/role");
 const activityController = require("../activities/activityController");
 
