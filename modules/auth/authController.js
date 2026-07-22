@@ -16,5 +16,4 @@ const getMe = catchAsync(async (req, res) => {
   const user = await service.getProfile(req.user.id);
   sendSuccess(res, 200, user);
 });
-
 module.exports = { register, login, getMe };

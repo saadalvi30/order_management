@@ -6,11 +6,9 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
-
 pool.on("connect", () => {
   console.log("✅ Connected to Supabase PostgreSQL");
 });
-
 pool.on("error", (err) => {
   console.error("Database Error:", err);
 });

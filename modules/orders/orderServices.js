@@ -43,7 +43,6 @@ async function createOrder(user, body, idempotencyKey) {
   validateCreateOrderInput(body);
   const { items } = body;
 
-  // --- Idempotency check (outside the transaction — just a read) ---
   if (idempotencyKey) {
     const existing = await db.query(
       "SELECT orderid, responsedata FROM idempotency_keys WHERE customerid = $1 AND idempotencykey = $2",
@@ -63,10 +62,7 @@ async function createOrder(user, body, idempotencyKey) {
     let subtotal = 0;
     const orderItemsData = [];
 
-    // Lock and validate every product BEFORE creating anything
     for (const item of items) {
-      // FOR UPDATE locks this row until the transaction ends — any other
-      // concurrent transaction trying to reserve the same product waits here.
       const productResult = await client.query(
         "SELECT * FROM products WHERE id = $1 AND deletedat IS NULL FOR UPDATE",
         [item.productId]

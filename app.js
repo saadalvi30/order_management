@@ -10,6 +10,8 @@ const { errorHandler, notFoundHandler } = require("./common/middlewares/errorHan
 const authRoutes = require("./modules/auth/authRoutes");
 const productRoutes = require("./modules/products/productRoutes");
 const orderRoutes = require("./modules/orders/orderRoutes");
+const userRoutes = require("./modules/users/userRoutes");
+
 
 const app = express();
 
@@ -22,7 +24,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
-
+app.use("/users", userRoutes);
 app.use(notFoundHandler);
 
 app.use(errorHandler);

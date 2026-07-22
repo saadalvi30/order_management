@@ -10,7 +10,8 @@
  * /users:
  *   get:
  *     tags: [Users]
- *     summary: List all users (admin and staff)
+ *     summary: List all users (admin and staff
+ )
  *     description: >
  *       Returns all registered users. Can be filtered by role — useful for
  *       finding available staff members. Only accessible to ADMIN.

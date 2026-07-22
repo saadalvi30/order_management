@@ -58,4 +58,4 @@ async function getProductHistory(productId, query) {
   };
 }
 
-module.exports = { recordInventoryChange, getProductHistory };
+module.exports = { recordInventoryChange, getProductHistory };                      

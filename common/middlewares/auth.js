@@ -20,6 +20,7 @@ const authenticateUser = async (req, res, next) => {
       "SELECT * FROM users WHERE id = $1 AND deletedat IS NULL",
       [decoded.sub]
     );
+    
     const user = result.rows[0];
 
     if (!user) {
@@ -47,4 +48,4 @@ const authenticateUser = async (req, res, next) => {
   }
 };
 
-module.exports = authenticateUser;
+module.exports = authenticateUser;           
