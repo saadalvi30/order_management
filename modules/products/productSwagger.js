@@ -10,7 +10,7 @@
  * /products:
  *   post:
  *     tags: [Products]
- *     summary: Create a new product (admin only)
+ *     summary: Create a new product (admin /staff only)
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
  *       required: true
@@ -75,7 +75,7 @@
  *       404: { description: Not found }
  *   patch:
  *     tags: [Products]
- *     summary: Update product details (admin only)
+ *     summary: Update product details (admin /staff)
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
@@ -99,7 +99,7 @@
  *       404: { description: Not found }
  *   delete:
  *     tags: [Products]
- *     summary: Soft-delete a product (admin only)
+ *     summary: Soft-delete a product (admin/staff)
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path

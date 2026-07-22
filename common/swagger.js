@@ -11,6 +11,7 @@ const path = require("path");
      [{ url: "/", description: "localhost:3500/" }], 
          tags: [
       { name: "Auth", description: "Authentication APIs" },
+      { name:"Users"},
       { name: "Products", description: "Product inventory management" },
       { name: "Orders", description: "Order creation, fulfilment, and cancellation" },
     ],
