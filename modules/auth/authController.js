@@ -9,7 +9,7 @@ const register = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
   const result = await service.login(req.body);
-  sendSuccess(res, 200, result);
+  sendSuccess(res, 200,  result);
 });
 
 const getMe = catchAsync(async (req, res) => {

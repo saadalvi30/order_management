@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { 
@@ -37,5 +38,4 @@ async function withTransaction(callback) {
     client.release();
   }
 }
-
-module.exports = { query: (...args) => pool.query(...args), withTransaction, pool };
+module.exports = { query: (...args) => pool.query(...args), withTransaction, pool };  

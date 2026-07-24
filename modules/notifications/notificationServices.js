@@ -1,14 +1,10 @@
 const db = require("../../common/db");
 const logger = require("../../common/logger");
 const mailer = require("../../common/utils/mailer");
+const sms = require("../../common/utils/sms");
 
 const MAX_RETRY_COUNT = 3;
 
-/**
- * Adds a notification to the queue. Does NOT send anything itself —
- * actual delivery happens in the background worker (processQueue),
- * so this call is fast and never blocks the API response.
- */
 async function queueNotification({ userId, orderId, type, message }, client = db) {
   await client.query(
     `INSERT INTO notifications (userid, orderid, type, message, status)
@@ -17,14 +13,9 @@ async function queueNotification({ userId, orderId, type, message }, client = db
   );
 }
 
-/**
- * Background worker logic — picks up PENDING/FAILED notifications
- * (under the retry limit) and attempts delivery. Called on a schedule
- * by the cron job in jobs/notificationWorker.js.
- */
 async function processQueue() {
   const pending = await db.query(
-    `SELECT n.*, u.email AS userEmail, u.name AS userName
+    `SELECT n.*, u.email AS userEmail, u.name AS userName, u.phone AS userPhone
      FROM notifications n
      JOIN users u ON u.id = n.userid
      WHERE n.status IN ('PENDING', 'FAILED') AND n.retrycount < $1
@@ -43,6 +34,12 @@ async function processQueue() {
         message: notification.message,
         type: notification.type,
       });
+      if (notification.userphone) {
+        await sms.sendSms({
+          to: notification.userphone,
+          message: notification.message,
+        });
+      }
 
       await db.query(
         "UPDATE notifications SET status = 'SENT', sentat = CURRENT_TIMESTAMP WHERE id = $1",
