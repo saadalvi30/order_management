@@ -19,11 +19,12 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required: [name, email, password]
+ *             required: [name, email, password, phone]
  *             properties:
  *               name: { type: string, example: "Saad" }
  *               email: { type: string, example: "saad@gmail.com" }
  *               password: { type: string, example: "Passw0rd1" }
+ *               phone: { type: string, example: "+923055520419" }
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -36,6 +37,7 @@
  *                   id: 1
  *                   name: "Saad"
  *                   email: "saad@gmail.com"
+ *                   phone: "03134444445"
  *                   role: "CUSTOMER"
  *                 token: "eyJhbGciOiJIUzI1NiIs..."
  *       400: { description: Validation error }

@@ -7,7 +7,7 @@ const logger = require("../../common/logger");
 
 const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
 
-function validateRegisterInput({ name, email, password }) {
+function validateRegisterInput({ name, email, password,phone }) {
   if (!name || name.trim().length < 2) {
     throw ApiError.badRequest("name is required and must be at least 2 characters");
   }
@@ -21,12 +21,17 @@ function validateRegisterInput({ name, email, password }) {
   if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
     throw ApiError.badRequest("password must contain at least one letter and one number");
   }
+    if (phone && !/^\+?[0-9]{10,15}$/.test(phone)) {
+    throw ApiError.badRequest("phone must be a valid number, e.g. +923001234567");
+  }
+
 }
 
 function validateLoginInput({ email, password }) {
   if (!email || !password) {
     throw ApiError.badRequest("email and password are required");
   }
+  
 }
 
 function toPublicUser(user) {
@@ -45,8 +50,8 @@ async function register(body) {
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
   const insertResult = await db.query(
-    "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *",
-    [name, email, hashedPassword, ROLES.CUSTOMER]
+    "INSERT INTO users (name, email, password,phone, role) VALUES ($1, $2, $3, $4) RETURNING *",
+    [name, email, hashedPassword,phone, ROLES.CUSTOMER]
   );
 
   const user = insertResult.rows[0];
