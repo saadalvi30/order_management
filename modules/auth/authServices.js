@@ -40,7 +40,7 @@ function toPublicUser(user) {
 }
 async function register(body) {
   validateRegisterInput(body);
-  const { name, email, password } = body;
+  const { name, email, password,phones } = body;
 
   const existingResult = await db.query("SELECT id FROM users WHERE email = $1", [email]);
   if (existingResult.rows[0]) {

@@ -5,20 +5,21 @@ const logger = require("./common/logger");
 const db = require("./common/db");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./common/swagger");
-const requestLogger = require("./common/middleWares/requestLogger");
+const requestLogger = require("./common/middlewares/requestLogger");
 const { errorHandler, notFoundHandler } = require("./common/middlewares/errorHandling");
 const authRoutes = require("./modules/auth/authRoutes");
 const productRoutes = require("./modules/products/productRoutes");
 const orderRoutes = require("./modules/orders/orderRoutes");
 const userRoutes = require("./modules/users/userRoutes");
+const corsOptions = require("./common/cros.js");
+const cors = require("cors");
 
 
 const app = express();
 
 app.use(express.json());
 app.use(requestLogger);
-
-
+app.use(cors(corsOptions));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/auth", authRoutes);

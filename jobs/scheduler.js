@@ -10,7 +10,7 @@ function startScheduler() {
     logger.info("Reservation expiry job finished", result);
   });
 
-  cron.schedule("*/1000 * * * * *", async () => {
+  cron.schedule("*/2000 * * * * *", async () => {
     await runNotificationWorker();
   });
 

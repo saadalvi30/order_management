@@ -7,4 +7,4 @@ const getHistory = catchAsync(async (req, res) => {
   sendSuccess(res, 200, data, pagination);
 });
 
-module.exports = { getHistory };
+module.exports = { getHistory }; 
